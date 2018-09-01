@@ -38,6 +38,12 @@ func main() {
 			Name:   "create",
 			Usage:  "Create new snippet",
 			Action: Create,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "public",
+					Usage: "Create public Gist",
+				},
+			},
 		},
 	}
 
@@ -82,7 +88,10 @@ func Create(c *cli.Context) error {
 	tc := oauth2.NewClient(context.Background(), ts)
 
 	client := github.NewClient(tc)
+
+	public := c.Bool("public")
 	gist, _, err := client.Gists.Create(context.Background(), &github.Gist{
+		Public: github.Bool(public),
 		Files: map[github.GistFilename]github.GistFile{
 			github.GistFilename(filename): github.GistFile{
 				Content: github.String(string(bytes)),
